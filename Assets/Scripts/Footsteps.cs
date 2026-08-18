@@ -3,40 +3,34 @@ using UnityEngine;
 
 public class Footsteps : MonoBehaviour
 {
+    [SerializeField] private PlayerMovHandler playerMovHandler;
+    
     [SerializeField] private AudioSource footstepSource;
     [SerializeField] private List<AudioClip> audioClips = new List<AudioClip>();
 
-    [SerializeField] private float rangeBtwnSteps = 5;
+    [SerializeField] private float footstepDelay = 0.75f;
     private Vector3 lastPosition;
-    private float recordedRange;
-
-    void Awake()
-    {
-        lastPosition = transform.position;
-    }
+    private float timer;
 
     void Update()
     {
-        float distance = Vector3.Distance(transform.position, lastPosition);
-        lastPosition = transform.position;
+        if(lastPosition != transform.position) timer += Time.deltaTime;
 
-        if(distance == 0)
+        if(timer >= footstepDelay)
         {
-            recordedRange = 0;
-            return;
-        }
-        
-        recordedRange += distance;
-        if(recordedRange >= rangeBtwnSteps)
-        {
-            recordedRange = 0;
+            timer = 0;
             PlaySound();
         }
+
+        lastPosition = transform.position;
     }
 
     private void PlaySound()
     {
-        footstepSource.clip = audioClips.GetRandom();
+        AudioClip clip = audioClips.GetRandom();
+        if(playerMovHandler.IsGrounded(out Collider col) && col.TryGetComponent(out CustomFootstep custom)) clip = custom.AudioClip;
+        
+        footstepSource.clip = clip;
         footstepSource.pitch = Random.Range(0.8f, 1.2f);
         footstepSource.Play();
     }

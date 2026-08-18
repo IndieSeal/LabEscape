@@ -33,6 +33,16 @@ public class PlayerMovHandler : MonoBehaviour
         controller.Move(velocity * Time.deltaTime);
     }
 
+    public bool IsGrounded(out Collider collider)
+    {
+        collider = null;
+        
+        var targets = Physics.OverlapSphere(groundCheck.position, groundCRadius, groundMask);
+        if(targets.Length > 0) collider = targets[0];
+        
+        return targets.Length > 0;
+    }
+
     void OnDrawGizmos()
     {
         Gizmos.color = isGrounded ? Color.green : Color.red;

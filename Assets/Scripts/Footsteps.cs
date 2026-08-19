@@ -9,20 +9,17 @@ public class Footsteps : MonoBehaviour
     [SerializeField] private List<AudioClip> audioClips = new List<AudioClip>();
 
     [SerializeField] private float footstepDelay = 0.75f;
-    private Vector3 lastPosition;
     private float timer;
 
     void Update()
     {
-        if(lastPosition != transform.position) timer += Time.deltaTime;
+        if(PlayerInputHandler.Instance.Movement != Vector2.zero) timer += Time.deltaTime;
 
         if(timer >= footstepDelay)
         {
             timer = 0;
             PlaySound();
         }
-
-        lastPosition = transform.position;
     }
 
     private void PlaySound()

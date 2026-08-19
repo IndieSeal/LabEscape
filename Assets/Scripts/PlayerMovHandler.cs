@@ -16,15 +16,18 @@ public class PlayerMovHandler : MonoBehaviour
     [SerializeField] private float speed = 10;
     [SerializeField] private float gravity = -9.8f;
     private Vector3 velocity;
+
+    private IInteractable latestInteractable;
+
+    protected PlayerInputHandler Input => PlayerInputHandler.Instance;
     
     void Update()
     {
         isGrounded = Physics.CheckSphere(groundCheck.position, groundCRadius, groundMask);
         
-        float x = Input.GetAxisRaw("Horizontal") == 0 ? 0 : Input.GetAxis("Horizontal");
-        float z = Input.GetAxisRaw("Vertical") == 0 ? 0 : Input.GetAxis("Vertical");
+        Vector2 mov = Input.Movement;
 
-        Vector3 moveDirection = transform.right * x + transform.forward * z;
+        Vector3 moveDirection = transform.right * mov.x + transform.forward * mov.y;
         controller.Move(moveDirection * speed * Time.deltaTime);
 
         velocity.y += gravity * Time.deltaTime;
@@ -41,6 +44,31 @@ public class PlayerMovHandler : MonoBehaviour
         if(targets.Length > 0) collider = targets[0];
         
         return targets.Length > 0;
+    }
+
+    void OnTriggerEnter(Collider other)
+    {
+        if(other.TryGetComponent(out IInteractable interac))
+        {
+            interac.OnEnter();
+            latestInteractable = interac;
+        }
+    }
+
+    void OnTriggerStay(Collider other)
+    {
+        if(latestInteractable == null) return;
+
+        if (Input.WasInteractPressed) latestInteractable.OnInteract();
+    }
+
+    void OnTriggerExit(Collider other)
+    {
+        if(other.TryGetComponent(out IInteractable interac))
+        {
+            interac.OnExit();
+            latestInteractable = null;
+        }
     }
 
     void OnDrawGizmos()

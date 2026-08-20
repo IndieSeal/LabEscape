@@ -7,12 +7,12 @@ public class DialogueTrigger : MonoBehaviour, IInteractable
 
     public void OnEnter()
     {
-        DialogueManager.Instance.ShowPrompt();
+        PlayerUI.Instance.ShowPrompt();
     }
 
     public void OnExit()
     {
-        DialogueManager.Instance.HidePrompt();
+        PlayerUI.Instance.HidePrompt();
     }
 
     public void OnInteract()

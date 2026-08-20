@@ -1,3 +1,4 @@
+using System.Linq;
 using UnityEngine;
 using static DialogueManager;
 
@@ -8,6 +9,8 @@ public class CameraHandler : Singleton<CameraHandler>
         Player,
         Dialogue
     }
+
+    protected PlayerInputHandler PInput => PlayerInputHandler.Instance;
     
     [SerializeField] private float mouseSens = 100f;
     [SerializeField] private Transform playerBody;
@@ -20,6 +23,10 @@ public class CameraHandler : Singleton<CameraHandler>
     private Quaternion prevQuat;
     private Vector3 prevPos;
     private float prevFOV;
+
+    [Header("Interaction")]
+    [SerializeField] private float interactionDistance = 4f;
+    private IInteractable latestInteractable;
 
     protected override void Awake()
     {
@@ -43,8 +50,30 @@ public class CameraHandler : Singleton<CameraHandler>
 
     void Update()
     {
+        HandleInteractions();
+        
         if(CurrentState == EState.Player) HandlePlayer();
         else if(CurrentState == EState.Dialogue) HandleDialogue();
+    }
+
+    private void HandleInteractions()
+    {
+        var hits = Physics.RaycastAll(transform.position, transform.forward, interactionDistance)
+            .Select(x => x.collider.GetComponent<IInteractable>()).Where(x => x != null).ToList();
+        if(latestInteractable == null && hits.Count > 0)
+        {
+            latestInteractable = hits[0];
+            latestInteractable.OnEnter();
+        }
+        else if(latestInteractable != null)
+        {
+            if(!hits.ToList().Contains(latestInteractable))
+            {
+                latestInteractable.OnExit();
+                latestInteractable = null;
+            }
+            else if(PInput.WasInteractPressed) latestInteractable.OnInteract();
+        }
     }
 
     private void HandlePlayer()
@@ -83,5 +112,11 @@ public class CameraHandler : Singleton<CameraHandler>
         transform.position = prevPos;
         transform.rotation = prevQuat;
         cam.fieldOfView = prevFOV;
+    }
+
+    void OnDrawGizmos()
+    {
+        Gizmos.color = latestInteractable == null ? Color.red : Color.green;
+        Gizmos.DrawRay(transform.position, transform.forward * interactionDistance);        
     }
 }

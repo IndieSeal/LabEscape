@@ -1,1 +1,15 @@
 https://pixabay.com/sound-effects/people-coughing-82093/
+https://pixabay.com/sound-effects/people-man-scream-259682/
+https://assetstore.unity.com/packages/p/blood-gush-73426
+https://assetstore.unity.com/packages/3d/characters/monster-muscomorph-112037
+https://assetstore.unity.com/packages/3d/props/electronics/flashlight-18972
+https://assetstore.unity.com/packages/3d/environments/sci-fi/real-stars-skybox-lite-116333
+https://assetstore.unity.com/packages/tools/gui/text-animator-for-unity-ui-toolkit-and-text-mesh-pro-341308
+https://assetstore.unity.com/packages/3d/true-horror-crawler-70609
+https://drillimpact.itch.io/psx-first-person-arms-free
+https://hazardpay.itch.io/40-free-psx-crunchy-footsteps
+https://yugg0.itch.io/blood-overlay-shader-for-unity-6
+https://ghost-bit-studio.itch.io/vol1-20-essential-ps1-horror-sound-effects
+https://crowshade.itch.io/post-dream-music
+https://colby-o.itch.io/vntg-shaders
+https://flakdeau19.itch.io/pixel-art-texture-pack-256x256

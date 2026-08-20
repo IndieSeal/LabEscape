@@ -20,7 +20,6 @@ public class DialogueManager : Singleton<DialogueManager>
     [SerializeField] private TMP_Text dialogueTxt;
     private TypewriterCore typewriter;
     
-    [SerializeField] private GameObject promptTxt;
     public DialogueTarget Target { get; private set; }
     private bool isTypewriterDone = false;
 
@@ -40,10 +39,6 @@ public class DialogueManager : Singleton<DialogueManager>
     {
         typewriter.onTextShowed.RemoveListener(OnTextShowed);
     }
-
-    //These shouldn't be in DialogueManager, they need to be managed by the Triggers.
-    public void ShowPrompt() => promptTxt.SetActive(true);
-    public void HidePrompt() => promptTxt.SetActive(false);
 
     // Will change to scriptable objects later (or just in-scene variables, depends on wether I want the camera to be movable to point at things)
     public void TriggerDialogue(string text, DialogueTarget target)
@@ -66,8 +61,6 @@ public class DialogueManager : Singleton<DialogueManager>
         dialogueBox.SetActive(true);
         typewriter.TextAnimator.SetTextToSource(text);
 
-        HidePrompt();
-        
         OnDialogueStarted?.Invoke(Target);
     }
 
@@ -75,7 +68,6 @@ public class DialogueManager : Singleton<DialogueManager>
     {
         typewriter.TextAnimator.SetText("");
         dialogueBox.SetActive(false);
-        ShowPrompt();
 
         Target = null;
 

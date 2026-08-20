@@ -18,8 +18,6 @@ public class PlayerMovHandler : MonoBehaviour
     private Vector3 velocity;
     private bool canMove = true;
 
-    private IInteractable latestInteractable;
-
     protected PlayerInputHandler Input => PlayerInputHandler.Instance;
 
     void OnEnable()
@@ -36,7 +34,6 @@ public class PlayerMovHandler : MonoBehaviour
 
     void Update()
     {
-        TryInteract();
         if(!canMove) return;
         
         isGrounded = Physics.CheckSphere(groundCheck.position, groundCRadius, groundMask);
@@ -70,31 +67,6 @@ public class PlayerMovHandler : MonoBehaviour
     private void EnablePlayerMovement()
     {
         canMove = true;
-    }
-
-    void OnTriggerEnter(Collider other)
-    {
-        if(other.TryGetComponent(out IInteractable interac))
-        {
-            interac.OnEnter();
-            latestInteractable = interac;
-        }
-    }
-
-    private void TryInteract()
-    {
-        if(latestInteractable == null) return;
-
-        if (Input.WasInteractPressed) latestInteractable.OnInteract();
-    }
-
-    void OnTriggerExit(Collider other)
-    {
-        if(other.TryGetComponent(out IInteractable interac))
-        {
-            interac.OnExit();
-            latestInteractable = null;
-        }
     }
 
     void OnDrawGizmos()

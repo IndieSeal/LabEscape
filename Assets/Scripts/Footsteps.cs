@@ -9,10 +9,19 @@ public class Footsteps : MonoBehaviour
     [SerializeField] private List<AudioClip> audioClips = new List<AudioClip>();
 
     [SerializeField] private float footstepDelay = 0.75f;
+    private bool enabledFootsteps = true;
     private float timer;
+
+    void OnEnable()
+    {
+        DialogueManager.OnDialogueStarted += DisableFootsteps;
+        DialogueManager.OnDialogueEnded += EnableFootsteps;
+    }
 
     void Update()
     {
+        if(!enabledFootsteps) return;
+
         if(PlayerInputHandler.Instance.Movement != Vector2.zero) timer += Time.deltaTime;
 
         if(timer >= footstepDelay)
@@ -31,4 +40,7 @@ public class Footsteps : MonoBehaviour
         footstepSource.pitch = Random.Range(0.8f, 1.2f);
         footstepSource.Play();
     }
+
+    private void DisableFootsteps(DialogueManager.DialogueTarget target) => enabledFootsteps = false;
+    private void EnableFootsteps() => enabledFootsteps = true;
 }

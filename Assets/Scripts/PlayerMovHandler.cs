@@ -16,13 +16,29 @@ public class PlayerMovHandler : MonoBehaviour
     [SerializeField] private float speed = 10;
     [SerializeField] private float gravity = -9.8f;
     private Vector3 velocity;
+    private bool canMove = true;
 
     private IInteractable latestInteractable;
 
     protected PlayerInputHandler Input => PlayerInputHandler.Instance;
-    
+
+    void OnEnable()
+    {
+        DialogueManager.OnDialogueStarted += DisablePlayerMovement;
+        DialogueManager.OnDialogueEnded += EnablePlayerMovement;
+    }
+
+    void OnDisable()
+    {
+        DialogueManager.OnDialogueStarted -= DisablePlayerMovement;
+        DialogueManager.OnDialogueEnded -= EnablePlayerMovement;
+    }
+
     void Update()
     {
+        TryInteract();
+        if(!canMove) return;
+        
         isGrounded = Physics.CheckSphere(groundCheck.position, groundCRadius, groundMask);
         
         Vector2 mov = Input.Movement;
@@ -46,6 +62,16 @@ public class PlayerMovHandler : MonoBehaviour
         return targets.Length > 0;
     }
 
+    private void DisablePlayerMovement(DialogueManager.DialogueTarget target = null)
+    {
+        canMove = false;
+    }
+
+    private void EnablePlayerMovement()
+    {
+        canMove = true;
+    }
+
     void OnTriggerEnter(Collider other)
     {
         if(other.TryGetComponent(out IInteractable interac))
@@ -55,7 +81,7 @@ public class PlayerMovHandler : MonoBehaviour
         }
     }
 
-    void OnTriggerStay(Collider other)
+    private void TryInteract()
     {
         if(latestInteractable == null) return;
 

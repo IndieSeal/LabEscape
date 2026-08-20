@@ -17,6 +17,8 @@ public class CameraHandler : Singleton<CameraHandler>
     public EState CurrentState = EState.Player;
 
     private DialogueTarget dialogueTarget;
+    private Quaternion prevQuat;
+    private Vector3 prevPos;
     private float prevFOV;
 
     protected override void Awake()
@@ -25,6 +27,18 @@ public class CameraHandler : Singleton<CameraHandler>
         
         Cursor.lockState = CursorLockMode.Locked;
         cam = GetComponent<Camera>();
+    }
+
+    void OnEnable()
+    {
+        OnDialogueStarted += StartDialogue;
+        OnDialogueEnded += EndDialogue;
+    }
+
+    void OnDisable()
+    {
+        OnDialogueStarted -= StartDialogue;
+        OnDialogueEnded -= EndDialogue;
     }
 
     void Update()
@@ -49,7 +63,6 @@ public class CameraHandler : Singleton<CameraHandler>
         transform.position = dialogueTarget.cameraAt.position;
         transform.LookAt(dialogueTarget.lookAt);
 
-        prevFOV = cam.fieldOfView;
         cam.fieldOfView = dialogueTarget.cameraFOV;
     }
 
@@ -57,6 +70,9 @@ public class CameraHandler : Singleton<CameraHandler>
     {
         CurrentState = EState.Dialogue;
 
+        prevFOV = cam.fieldOfView;
+        prevPos = transform.position;
+        prevQuat = transform.rotation;
         dialogueTarget = target;
     }
 
@@ -64,6 +80,8 @@ public class CameraHandler : Singleton<CameraHandler>
     {
         CurrentState = EState.Player;
 
+        transform.position = prevPos;
+        transform.rotation = prevQuat;
         cam.fieldOfView = prevFOV;
     }
 }

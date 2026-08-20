@@ -3,7 +3,7 @@ using UnityEngine;
 public class DialogueTrigger : MonoBehaviour, IInteractable
 {
     [SerializeField] private DialogueManager.DialogueTarget target;
-    [SerializeField, TextArea] private string myText = "This is an example dialogue";
+    [SerializeField] private DialogueSO myText;
 
     public void OnEnter()
     {

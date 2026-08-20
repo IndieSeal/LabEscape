@@ -19,6 +19,9 @@ public class DialogueManager : Singleton<DialogueManager>
     [SerializeField] private GameObject dialogueBox;
     [SerializeField] private TMP_Text dialogueTxt;
     private TypewriterCore typewriter;
+
+    private DialogueSO dialogueSO;
+    private int index;
     
     public DialogueTarget Target { get; private set; }
     private bool isTypewriterDone = false;
@@ -41,7 +44,7 @@ public class DialogueManager : Singleton<DialogueManager>
     }
 
     // Will change to scriptable objects later (or just in-scene variables, depends on wether I want the camera to be movable to point at things)
-    public void TriggerDialogue(string text, DialogueTarget target)
+    public void TriggerDialogue(DialogueSO text, DialogueTarget target)
     {
         if(Target != null)
         {
@@ -52,14 +55,16 @@ public class DialogueManager : Singleton<DialogueManager>
         StartDialogue(text, target);
     }
     
-    public void StartDialogue(string text, DialogueTarget target)
+    public void StartDialogue(DialogueSO text, DialogueTarget target)
     {
         isTypewriterDone = false;
         
         Target = target;
 
-        dialogueBox.SetActive(true);
-        typewriter.TextAnimator.SetTextToSource(text);
+        dialogueSO = text;
+        index = 0;
+
+        UpdateDialogue();
 
         OnDialogueStarted?.Invoke(Target);
     }
@@ -78,13 +83,23 @@ public class DialogueManager : Singleton<DialogueManager>
     {
         if (isTypewriterDone)
         {
-            // continue
-            EndDialogue();
+            index++;
+            
+            if(index >= dialogueSO.dialogues.Count) EndDialogue();
+            else UpdateDialogue();
         }
         else
         {
             // skip dialogue if I want to implement that.
         }
+    }
+
+    private void UpdateDialogue()
+    {
+        isTypewriterDone = false;
+        
+        dialogueBox.SetActive(true);
+        typewriter.TextAnimator.SetTextToSource(dialogueSO.dialogues[index]);
     }
 
     public void OnTextShowed() => isTypewriterDone = true;

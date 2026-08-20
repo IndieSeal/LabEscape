@@ -13,3 +13,4 @@ https://ghost-bit-studio.itch.io/vol1-20-essential-ps1-horror-sound-effects
 https://crowshade.itch.io/post-dream-music
 https://colby-o.itch.io/vntg-shaders
 https://flakdeau19.itch.io/pixel-art-texture-pack-256x256
+https://gleeson.itch.io/mgs1-fonts

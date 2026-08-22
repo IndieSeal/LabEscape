@@ -5,8 +5,8 @@ using UnityEngine;
 
 public class DialogueManager : Singleton<DialogueManager>
 {
-    public static event Action<DialogueTarget> OnDialogueStarted;
-    public static event Action OnDialogueEnded;
+    public static Action<DialogueTarget> OnDialogueStarted;
+    public static Action OnDialogueEnded;
     
     [Serializable]
     public class DialogueTarget

@@ -15,3 +15,5 @@ https://colby-o.itch.io/vntg-shaders
 https://flakdeau19.itch.io/pixel-art-texture-pack-256x256
 https://gleeson.itch.io/mgs1-fonts
 https://sketchfab.com/3d-models/lab-scene-1ab1bd8157c0477e80b5ed8d658015b6
+https://sketchfab.com/3d-models/semi-futuristic-entry-device-e0262d52dc0b4124bc14814e7c1f689a
+https://pixabay.com/sound-effects/film-special-effects-flashlight-switch-102792/

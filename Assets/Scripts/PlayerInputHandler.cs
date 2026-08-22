@@ -4,6 +4,7 @@ public class PlayerInputHandler : Singleton<PlayerInputHandler>
 {
     public Vector2 Movement => GetMovement();
     public bool WasInteractPressed => Input.GetKeyDown(KeyCode.E);
+    public bool WasFlashlightPressed => Input.GetKeyDown(KeyCode.F);
 
     private Vector2 GetMovement()
     {

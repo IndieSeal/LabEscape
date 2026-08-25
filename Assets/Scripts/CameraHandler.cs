@@ -78,8 +78,8 @@ public class CameraHandler : Singleton<CameraHandler>
 
     private void HandlePlayer()
     {
-        float mouseX = Input.GetAxis("Mouse X") * mouseSens * Time.deltaTime;
-        float mouseY = Input.GetAxis("Mouse Y") * mouseSens * Time.deltaTime;
+        float mouseX = PInput.MouseMovement.x * mouseSens * Time.deltaTime;
+        float mouseY = PInput.MouseMovement.y * mouseSens * Time.deltaTime;
 
         xRotation = Mathf.Clamp(xRotation - mouseY, -90, 90f);
 

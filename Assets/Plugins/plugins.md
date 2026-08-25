@@ -17,3 +17,5 @@ https://gleeson.itch.io/mgs1-fonts
 https://sketchfab.com/3d-models/lab-scene-1ab1bd8157c0477e80b5ed8d658015b6
 https://sketchfab.com/3d-models/semi-futuristic-entry-device-e0262d52dc0b4124bc14814e7c1f689a
 https://pixabay.com/sound-effects/film-special-effects-flashlight-switch-102792/
+https://sketchfab.com/3d-models/keycard-d942473ab5bc490caee4106c9b9fa5cb
+https://pixabay.com/sound-effects/household-electronic-door-opening-102496/

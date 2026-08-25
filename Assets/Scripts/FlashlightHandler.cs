@@ -4,6 +4,8 @@ using UnityEngine;
 public class FlashlightHandler : MonoBehaviour
 {
     protected PlayerInputHandler Input => PlayerInputHandler.Instance;
+
+    [SerializeField] private Animator handAnimator;    
     
     [SerializeField] private GameObject flashlightLight;
     [SerializeField] private AudioSource toggleFlashlightSource;
@@ -13,6 +15,8 @@ public class FlashlightHandler : MonoBehaviour
 
     void Awake()
     {
+        // There's definitely better ways to code this, but nothing comes to mind atm
+        isOn = !isOn;
         ToggleFlashlight();
     }
 
@@ -20,25 +24,34 @@ public class FlashlightHandler : MonoBehaviour
     {
         DialogueManager.OnDialogueStarted += DisableFlashlight;
         DialogueManager.OnDialogueEnded += ForceEnable;
+
+        Keycard.OnCollectiblePicked += GrabCollectible;
     }
 
     void OnDisable()
     {
         DialogueManager.OnDialogueStarted -= DisableFlashlight;
         DialogueManager.OnDialogueEnded -= ForceEnable;
+
+        Keycard.OnCollectiblePicked -= GrabCollectible;
     }
 
     void Update()
     {
-        if(Input.WasFlashlightPressed && !forced) ToggleFlashlight();
+        if(Input.WasFlashlightPressed && !forced) ToggleFlashlight(true);
     }
 
-    private void ToggleFlashlight()
+    private void GrabCollectible(ECollectible collectible)
+    {
+        handAnimator.SetTrigger("Grab");
+    }
+
+    private void ToggleFlashlight(bool manual = false)
     {
         if(isOn) DisableFlashlight();
         else EnableFlashlight();
 
-        toggleFlashlightSource.Play();
+        if(manual) toggleFlashlightSource.Play();
     }
 
     private void DisableFlashlight(DialogueManager.DialogueTarget target = null)

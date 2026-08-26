@@ -7,7 +7,8 @@ public class CameraHandler : Singleton<CameraHandler>
     public enum EState
     {
         Player,
-        Dialogue
+        Dialogue,
+        Hiding
     }
 
     protected PlayerInputHandler PInput => PlayerInputHandler.Instance;
@@ -22,11 +23,15 @@ public class CameraHandler : Singleton<CameraHandler>
     private DialogueTarget dialogueTarget;
     private Quaternion prevQuat;
     private Vector3 prevPos;
+    private Vector3 prevDir;
     private float prevFOV;
 
     [Header("Interaction")]
     [SerializeField] private float interactionDistance = 4f;
     private IInteractable latestInteractable;
+
+    protected Vector3 RaycastStart => CurrentState == EState.Player ? transform.position : prevPos;
+    protected Vector3 RaycastDirection => CurrentState == EState.Player ? transform.forward : prevDir;
 
     protected override void Awake()
     {
@@ -40,12 +45,18 @@ public class CameraHandler : Singleton<CameraHandler>
     {
         OnDialogueStarted += StartDialogue;
         OnDialogueEnded += EndDialogue;
+
+        Locker.OnHidingStart += StartHiding;
+        Locker.OnHidingEnded += EndDialogue;
     }
 
     void OnDisable()
     {
         OnDialogueStarted -= StartDialogue;
         OnDialogueEnded -= EndDialogue;
+
+        Locker.OnHidingStart -= StartHiding;
+        Locker.OnHidingEnded -= EndDialogue;
     }
 
     void Update()
@@ -53,12 +64,12 @@ public class CameraHandler : Singleton<CameraHandler>
         HandleInteractions();
         
         if(CurrentState == EState.Player) HandlePlayer();
-        else if(CurrentState == EState.Dialogue) HandleDialogue();
+        else if(CurrentState == EState.Dialogue || CurrentState == EState.Hiding) HandleTarget();
     }
 
     private void HandleInteractions()
     {
-        var hits = Physics.RaycastAll(transform.position, transform.forward, interactionDistance)
+        var hits = Physics.RaycastAll(RaycastStart, RaycastDirection, interactionDistance)
             .Select(x => x.collider.GetComponent<IInteractable>()).Where(x => x != null).ToList();
         if(latestInteractable == null && hits.Count > 0)
         {
@@ -87,7 +98,7 @@ public class CameraHandler : Singleton<CameraHandler>
         playerBody.Rotate(Vector3.up * mouseX);
     }
 
-    private void HandleDialogue()
+    private void HandleTarget()
     {
         transform.position = dialogueTarget.cameraAt.position;
         transform.LookAt(dialogueTarget.lookAt);
@@ -98,9 +109,20 @@ public class CameraHandler : Singleton<CameraHandler>
     public void StartDialogue(DialogueTarget target)
     {
         CurrentState = EState.Dialogue;
+        SetPreviousAndLooks(target);
+    }
 
+    public void StartHiding(DialogueTarget target)
+    {
+        CurrentState = EState.Hiding;
+        SetPreviousAndLooks(target);
+    }
+
+    private void SetPreviousAndLooks(DialogueTarget target)
+    {
         prevFOV = cam.fieldOfView;
         prevPos = transform.position;
+        prevDir = transform.forward;
         prevQuat = transform.rotation;
         dialogueTarget = target;
     }
@@ -117,6 +139,6 @@ public class CameraHandler : Singleton<CameraHandler>
     void OnDrawGizmos()
     {
         Gizmos.color = latestInteractable == null ? Color.red : Color.green;
-        Gizmos.DrawRay(transform.position, transform.forward * interactionDistance);        
+        Gizmos.DrawRay(RaycastStart, RaycastDirection * interactionDistance);        
     }
 }

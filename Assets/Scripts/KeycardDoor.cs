@@ -57,9 +57,10 @@ public class KeycardDoor : MonoBehaviour, IInteractable
         if(cardHit == null) return;
 
         float dist = Vector3.Distance(endPoint.position, cardHit.Value.point) / maxDistance;
-        
         if(dist <= 0.25f)
         {
+            collectibleTransform.position = endPoint.position;
+            
             reachedPoint = true;
             keycardAccessTrue.Play();
 
@@ -67,7 +68,7 @@ public class KeycardDoor : MonoBehaviour, IInteractable
             return;
         }
         
-        collectibleTransform.position = Vector3.Lerp(endPoint.position, startPoint.position, Vector3.Distance(endPoint.position, cardHit.Value.point) / maxDistance);
+        collectibleTransform.position = Vector3.Lerp(endPoint.position, startPoint.position, dist);
     }
 
     private IEnumerator DoorOpenCoroutine()

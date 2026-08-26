@@ -14,8 +14,14 @@ public class Footsteps : MonoBehaviour
 
     void OnEnable()
     {
-        DialogueManager.OnDialogueStarted += DisableFootsteps;
-        DialogueManager.OnDialogueEnded += EnableFootsteps;
+        CameraHandler.OnStopPlayer += DisableFootsteps;
+        CameraHandler.OnResumePlayer += EnableFootsteps;
+    }
+
+    void OnDisable()
+    {
+        CameraHandler.OnStopPlayer -= DisableFootsteps;
+        CameraHandler.OnResumePlayer -= EnableFootsteps;
     }
 
     void Update()
@@ -41,6 +47,6 @@ public class Footsteps : MonoBehaviour
         footstepSource.Play();
     }
 
-    private void DisableFootsteps(DialogueManager.DialogueTarget target) => enabledFootsteps = false;
+    private void DisableFootsteps() => enabledFootsteps = false;
     private void EnableFootsteps() => enabledFootsteps = true;
 }

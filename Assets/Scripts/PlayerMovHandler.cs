@@ -22,14 +22,14 @@ public class PlayerMovHandler : MonoBehaviour
 
     void OnEnable()
     {
-        DialogueManager.OnDialogueStarted += DisablePlayerMovement;
-        DialogueManager.OnDialogueEnded += EnablePlayerMovement;
+        CameraHandler.OnStopPlayer += DisablePlayerMovement;
+        CameraHandler.OnResumePlayer += EnablePlayerMovement;
     }
 
     void OnDisable()
     {
-        DialogueManager.OnDialogueStarted -= DisablePlayerMovement;
-        DialogueManager.OnDialogueEnded -= EnablePlayerMovement;
+        CameraHandler.OnStopPlayer -= DisablePlayerMovement;
+        CameraHandler.OnResumePlayer -= EnablePlayerMovement;
     }
 
     void Update()
@@ -59,7 +59,7 @@ public class PlayerMovHandler : MonoBehaviour
         return targets.Length > 0;
     }
 
-    private void DisablePlayerMovement(DialogueManager.DialogueTarget target = null)
+    private void DisablePlayerMovement()
     {
         canMove = false;
     }

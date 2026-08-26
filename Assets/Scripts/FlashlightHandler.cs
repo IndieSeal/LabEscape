@@ -22,16 +22,16 @@ public class FlashlightHandler : MonoBehaviour
 
     void OnEnable()
     {
-        DialogueManager.OnDialogueStarted += DisableFlashlight;
-        DialogueManager.OnDialogueEnded += ForceEnable;
+        CameraHandler.OnStopPlayer += ForceDisableFlashlight;
+        CameraHandler.OnResumePlayer += ForceEnable;
 
         Keycard.OnCollectiblePicked += GrabCollectible;
     }
 
     void OnDisable()
     {
-        DialogueManager.OnDialogueStarted -= DisableFlashlight;
-        DialogueManager.OnDialogueEnded -= ForceEnable;
+        CameraHandler.OnStopPlayer -= ForceDisableFlashlight;
+        CameraHandler.OnResumePlayer -= ForceEnable;
 
         Keycard.OnCollectiblePicked -= GrabCollectible;
     }
@@ -54,14 +54,15 @@ public class FlashlightHandler : MonoBehaviour
         if(manual) toggleFlashlightSource.Play();
     }
 
-    private void DisableFlashlight(DialogueManager.DialogueTarget target = null)
+    private void ForceDisableFlashlight()
     {
-        if(target != null)
-        {
-            forced = true;
-            wasOn = isOn;
-        }
-        
+        forced = true;
+        wasOn = isOn;
+        DisableFlashlight();   
+    }
+
+    private void DisableFlashlight()
+    {
         flashlightLight.SetActive(false);
         isOn = false;
     }

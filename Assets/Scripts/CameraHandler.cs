@@ -1,15 +1,20 @@
+using System;
 using System.Linq;
 using UnityEngine;
 using static DialogueManager;
 
+public enum EPlayerState
+{
+    Player,
+    Dialogue,
+    Hiding
+}
+
 public class CameraHandler : Singleton<CameraHandler>
 {
-    public enum EState
-    {
-        Player,
-        Dialogue,
-        Hiding
-    }
+    public static event Action<EPlayerState> OnPlayerStateChanged;
+    public static event Action OnResumePlayer;
+    public static event Action OnStopPlayer;
 
     protected PlayerInputHandler PInput => PlayerInputHandler.Instance;
     
@@ -18,7 +23,15 @@ public class CameraHandler : Singleton<CameraHandler>
     private Camera cam;
     private float xRotation = 0;
 
-    public EState CurrentState = EState.Player;
+    public EPlayerState CurrentState { get => currentState; set
+        {
+            currentState = value;
+            OnPlayerStateChanged?.Invoke(currentState);
+            if(currentState != EPlayerState.Player) OnStopPlayer?.Invoke();
+            else OnResumePlayer?.Invoke();
+        }
+    }
+    protected EPlayerState currentState = EPlayerState.Player;
 
     private DialogueTarget dialogueTarget;
     private Quaternion prevQuat;
@@ -30,8 +43,8 @@ public class CameraHandler : Singleton<CameraHandler>
     [SerializeField] private float interactionDistance = 4f;
     private IInteractable latestInteractable;
 
-    protected Vector3 RaycastStart => CurrentState == EState.Player ? transform.position : prevPos;
-    protected Vector3 RaycastDirection => CurrentState == EState.Player ? transform.forward : prevDir;
+    protected Vector3 RaycastStart => CurrentState == EPlayerState.Player ? transform.position : prevPos;
+    protected Vector3 RaycastDirection => CurrentState == EPlayerState.Player ? transform.forward : prevDir;
 
     protected override void Awake()
     {
@@ -63,8 +76,8 @@ public class CameraHandler : Singleton<CameraHandler>
     {
         HandleInteractions();
         
-        if(CurrentState == EState.Player) HandlePlayer();
-        else if(CurrentState == EState.Dialogue || CurrentState == EState.Hiding) HandleTarget();
+        if(CurrentState == EPlayerState.Player) HandlePlayer();
+        else if(CurrentState == EPlayerState.Dialogue || CurrentState == EPlayerState.Hiding) HandleTarget();
     }
 
     private void HandleInteractions()
@@ -108,13 +121,13 @@ public class CameraHandler : Singleton<CameraHandler>
 
     public void StartDialogue(DialogueTarget target)
     {
-        CurrentState = EState.Dialogue;
+        CurrentState = EPlayerState.Dialogue;
         SetPreviousAndLooks(target);
     }
 
     public void StartHiding(DialogueTarget target)
     {
-        CurrentState = EState.Hiding;
+        CurrentState = EPlayerState.Hiding;
         SetPreviousAndLooks(target);
     }
 
@@ -129,7 +142,7 @@ public class CameraHandler : Singleton<CameraHandler>
 
     public void EndDialogue()
     {
-        CurrentState = EState.Player;
+        CurrentState = EPlayerState.Player;
 
         transform.position = prevPos;
         transform.rotation = prevQuat;

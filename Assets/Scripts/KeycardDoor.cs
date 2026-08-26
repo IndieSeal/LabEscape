@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -14,6 +15,10 @@ public class KeycardDoor : MonoBehaviour, IInteractable
 
     [SerializeField] private Transform collectibleTransform;
     [SerializeField] private ECollectible requiredCollectible;
+    [SerializeField] private Renderer redLight;
+    [SerializeField] private Renderer greenLight;
+    [SerializeField] private Material normalLightMat;
+    private Material greenLightMat;
 
     [SerializeField] private Transform startPoint;
     [SerializeField] private Transform endPoint;
@@ -26,6 +31,9 @@ public class KeycardDoor : MonoBehaviour, IInteractable
         collectibleTransform.gameObject.SetActive(false);
 
         maxDistance = Vector3.Distance(startPoint.position, endPoint.position);
+
+        greenLightMat = greenLight.material;
+        greenLight.material = normalLightMat;
     }
 
     void Update()
@@ -49,23 +57,38 @@ public class KeycardDoor : MonoBehaviour, IInteractable
         if(cardHit == null) return;
 
         float dist = Vector3.Distance(endPoint.position, cardHit.Value.point) / maxDistance;
-        Debug.Log(dist);
         
         if(dist <= 0.25f)
         {
             reachedPoint = true;
             keycardAccessTrue.Play();
 
-            animator.SetBool("IsOpen", true);
-            animator.SetTrigger("OpenDoor");
+            StartCoroutine(DoorOpenCoroutine());
             return;
         }
         
         collectibleTransform.position = Vector3.Lerp(endPoint.position, startPoint.position, Vector3.Distance(endPoint.position, cardHit.Value.point) / maxDistance);
     }
 
+    private IEnumerator DoorOpenCoroutine()
+    {
+        greenLight.material = greenLightMat;
+        redLight.material = normalLightMat;
+        
+        yield return new WaitForSeconds(0.3f);
+
+        animator.SetBool("IsOpen", true);
+        animator.SetTrigger("OpenDoor");
+
+        yield return new WaitForSeconds(0.2f);
+
+        StopInteraction();
+    }
+
     public void OnEnter()
     {
+        if(reachedPoint) return;
+        
         animator.ResetTrigger("Close");
         animator.SetTrigger("Open");
 
@@ -74,6 +97,8 @@ public class KeycardDoor : MonoBehaviour, IInteractable
 
     public void OnExit()
     {
+        if(reachedPoint) return;
+
         animator.ResetTrigger("Open");
         animator.SetTrigger("Close");
 
@@ -82,6 +107,8 @@ public class KeycardDoor : MonoBehaviour, IInteractable
 
     public void OnInteract()
     {
+        if(reachedPoint) return;
+        
         inputting = !inputting;
 
         //This is temporary, will change it for a handler that just inmovilizes the player
@@ -90,11 +117,15 @@ public class KeycardDoor : MonoBehaviour, IInteractable
             DialogueManager.OnDialogueStarted?.Invoke(target);
             Cursor.lockState = CursorLockMode.None;
         }
-        else
-        {
-            DialogueManager.OnDialogueEnded?.Invoke();
-            Cursor.lockState = CursorLockMode.Locked;
-            collectibleTransform.gameObject.SetActive(false);
-        }
+        else StopInteraction();
+    }
+
+    private void StopInteraction()
+    {
+        DialogueManager.OnDialogueEnded?.Invoke();
+        Cursor.lockState = CursorLockMode.Locked;
+        collectibleTransform.gameObject.SetActive(false);
+
+        PlayerUI.Instance.HidePrompt();
     }
 }

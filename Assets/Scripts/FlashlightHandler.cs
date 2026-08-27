@@ -8,6 +8,8 @@ public class FlashlightHandler : MonoBehaviour
     [SerializeField] private Animator handAnimator;    
     
     [SerializeField] private GameObject flashlightLight;
+    public Transform light => flashlightLight.transform;
+    
     [SerializeField] private AudioSource toggleFlashlightSource;
     private bool isOn = true;
     private bool wasOn;

@@ -16,6 +16,9 @@ public class CameraHandler : Singleton<CameraHandler>
     public static event Action OnResumePlayer;
     public static event Action OnStopPlayer;
 
+    public static event Action StartHoverOverInteractable;
+    public static event Action EndHoverOverInteractable;
+
     protected PlayerInputHandler PInput => PlayerInputHandler.Instance;
     
     [SerializeField] private float mouseSens = 100f;
@@ -38,6 +41,9 @@ public class CameraHandler : Singleton<CameraHandler>
     private Vector3 prevPos;
     private Vector3 prevDir;
     private float prevFOV;
+
+    [SerializeField] private FlashlightHandler flashlightHandler;
+    [SerializeField] private float flashlightRotSpeed = 4;
 
     [Header("Interaction")]
     [SerializeField] private float interactionDistance = 4f;
@@ -88,6 +94,8 @@ public class CameraHandler : Singleton<CameraHandler>
         {
             latestInteractable = hits[0];
             latestInteractable.OnEnter();
+
+            StartHoverOverInteractable?.Invoke();
         }
         else if(latestInteractable != null)
         {
@@ -95,6 +103,8 @@ public class CameraHandler : Singleton<CameraHandler>
             {
                 latestInteractable.OnExit();
                 latestInteractable = null;
+
+                EndHoverOverInteractable?.Invoke();
             }
             else if(PInput.WasInteractPressed) latestInteractable.OnInteract();
         }
@@ -108,6 +118,8 @@ public class CameraHandler : Singleton<CameraHandler>
         xRotation = Mathf.Clamp(xRotation - mouseY, -90, 90f);
 
         transform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
+        flashlightHandler.light.rotation = Quaternion.Lerp(flashlightHandler.light.rotation, transform.rotation, flashlightRotSpeed * Time.deltaTime);
+        
         playerBody.Rotate(Vector3.up * mouseX);
     }
 
